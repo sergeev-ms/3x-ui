@@ -123,6 +123,11 @@ func (t *Tgbot) Start(i18nFS embed.FS) error {
 		return err
 	}
 
+	err = bot.SetMyCommands(t.getMenuCommands())
+	if err != nil {
+		logger.Warning("Failed to set menu commands:", err)
+	}
+
 	// Start receiving Telegram bot messages
 	if !isRunning {
 		logger.Info("Telegram bot receiver started")
@@ -131,6 +136,18 @@ func (t *Tgbot) Start(i18nFS embed.FS) error {
 	}
 
 	return nil
+}
+
+func (t *Tgbot) getMenuCommands() *telego.SetMyCommandsParams {
+	//commands, err := bot.GetMyCommands(nil)
+	commandsParams := telego.SetMyCommandsParams{}
+	commands := []telego.BotCommand{
+		{"help", t.I18nBot("tgbot.menu.help")},
+		{"status", t.I18nBot("tgbot.menu.status")},
+		{"restart", t.I18nBot("tgbot.menu.restart")},
+		{"id", t.I18nBot("tgbot.menu.tgChatId")},
+	}
+	return commandsParams.WithCommands(commands...)
 }
 
 func (t *Tgbot) NewBot(token string, proxyUrl string, apiServerUrl string) (*telego.Bot, error) {
